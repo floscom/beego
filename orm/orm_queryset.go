@@ -55,16 +55,17 @@ func ColValue(opt operator, value interface{}) interface{} {
 
 // real query struct
 type querySet struct {
-	mi       *modelInfo
-	cond     *Condition
-	related  []string
-	relDepth int
-	limit    int64
-	offset   int64
-	groups   []string
-	orders   []string
-	distinct bool
-	orm      *orm
+	mi         *modelInfo
+	cond       *Condition
+	related    []string
+	relDepth   int
+	limit      int64
+	offset     int64
+	groups     []string
+	orders     []string
+	distinct   bool
+	distinctOn string
+	orm        *orm
 }
 
 var _ QuerySeter = new(querySet)
@@ -124,6 +125,12 @@ func (o querySet) OrderBy(exprs ...string) QuerySeter {
 // add DISTINCT to SELECT
 func (o querySet) Distinct() QuerySeter {
 	o.distinct = true
+	return &o
+}
+
+// add DISTINCT ON to SELECT
+func (o querySet) DistinctOn(on string) QuerySeter {
+	o.distinctOn = on
 	return &o
 }
 

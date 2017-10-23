@@ -48,7 +48,7 @@ var (
 		"lte":         true,
 		"eq":          true,
 		"nq":          true,
-		"ne":	       true,
+		"ne":          true,
 		"startswith":  true,
 		"endswith":    true,
 		"istartswith": true,
@@ -964,8 +964,13 @@ func (d *dbBase) ReadBatch(q dbQuerier, qs *querySet, mi *modelInfo, cond *Condi
 	if qs.distinct {
 		sqlSelect += " DISTINCT"
 	}
-	query := fmt.Sprintf("%s %s FROM %s%s%s T0 %s%s%s%s%s", sqlSelect, sels, Q, mi.table, Q, join, where, groupBy, orderBy, limit)
+	if qs.distinctOn != "" {
+		sqlSelect += fmt.Sprintf(" DISTINCT ON(%s) %s,", qs.distinctOn, qs.distinctOn)
+		sels = strings.Replace(sels, qs.distinctOn+",", "", -1)
+	}
 
+	//sels = ""
+	query := fmt.Sprintf("%s %s FROM %s%s%s T0 %s%s%s%s%s", sqlSelect, sels, Q, mi.table, Q, join, where, groupBy, orderBy, limit)
 	d.ins.ReplaceMarks(&query)
 
 	var rs *sql.Rows
@@ -1094,10 +1099,15 @@ func (d *dbBase) Count(q dbQuerier, qs *querySet, mi *modelInfo, cond *Condition
 
 	Q := d.ins.TableQuote()
 
-	query := fmt.Sprintf("SELECT COUNT(*) FROM %s%s%s T0 %s%s%s", Q, mi.table, Q, join, where, groupBy)
+	distinctOn := "*"
+	if qs.distinctOn != "" {
+		distinctOn = fmt.Sprintf("DISTINCT %s", qs.distinctOn)
+	}
+
+	query := fmt.Sprintf("SELECT COUNT(%s) FROM %s%s%s T0 %s%s%s", distinctOn, Q, mi.table, Q, join, where, groupBy)
 
 	if groupBy != "" {
-		query = fmt.Sprintf("SELECT COUNT(*) FROM (%s) AS T", query)
+		query = fmt.Sprintf("SELECT COUNT(%s) FROM (%s) AS T", distinctOn, query)
 	}
 
 	d.ins.ReplaceMarks(&query)
@@ -1620,6 +1630,9 @@ func (d *dbBase) ReadValues(q dbQuerier, qs *querySet, mi *modelInfo, cond *Cond
 	sqlSelect := "SELECT"
 	if qs.distinct {
 		sqlSelect += " DISTINCT"
+	}
+	if qs.distinctOn != "" {
+		sqlSelect += fmt.Sprintf(" DISTINCT ON(%s) %s AS dval,", qs.distinctOn, qs.distinctOn)
 	}
 	query := fmt.Sprintf("%s %s FROM %s%s%s T0 %s%s%s%s%s", sqlSelect, sels, Q, mi.table, Q, join, where, groupBy, orderBy, limit)
 
