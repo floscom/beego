@@ -79,7 +79,7 @@ func (o querySet) GetModelInfo() *modelInfo {
 	return o.mi
 }
 
-func (o querySet) GetFields() []string {
+func (o querySet) GetColumns() []string {
 	return o.mi.fields.dbcols
 }
 
