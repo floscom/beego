@@ -126,6 +126,9 @@ type Inserter interface {
 
 // QuerySeter query seter
 type QuerySeter interface {
+	GetTableName() string
+	GetModelInfo() *modelInfo
+	GetColumns() []string
 	// add condition expression to QuerySeter.
 	// for example:
 	//	filter by UserName == 'slene'

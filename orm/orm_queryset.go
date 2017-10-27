@@ -70,6 +70,19 @@ type querySet struct {
 
 var _ QuerySeter = new(querySet)
 
+// get table name
+func (o querySet) GetTableName() string {
+	return o.mi.table
+}
+
+func (o querySet) GetModelInfo() *modelInfo {
+	return o.mi
+}
+
+func (o querySet) GetFields() []string {
+	return o.mi.fields.dbcols
+}
+
 // add condition expression to QuerySeter.
 func (o querySet) Filter(expr string, args ...interface{}) QuerySeter {
 	if o.cond == nil {
