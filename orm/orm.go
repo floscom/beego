@@ -57,6 +57,7 @@ import (
 	"fmt"
 	"os"
 	"reflect"
+	"regexp"
 	"time"
 )
 
@@ -434,9 +435,20 @@ func (o *orm) getRelQs(md interface{}, mi *modelInfo, fi *fieldInfo) *querySet {
 func (o *orm) QueryTable(ptrStructOrTableName interface{}) (qs QuerySeter) {
 	name := ""
 	if table, ok := ptrStructOrTableName.(string); ok {
-		name = snakeString(table)
-		if mi, ok := modelCache.get(name); ok {
-			qs = newQuerySet(o, mi)
+		// if there is a query as tablename
+		var re = regexp.MustCompile(`FROM\s([a-zA-Z_0-9]+)\s`)
+		if re.MatchString(table) {
+			tableName := re.FindStringSubmatch(table)
+			name = snakeString(tableName[1])
+			if mi, ok := modelCache.get(name); ok {
+				mi.table = table
+				qs = newQuerySet(o, mi)
+			}
+		} else {
+			name = snakeString(table)
+			if mi, ok := modelCache.get(name); ok {
+				qs = newQuerySet(o, mi)
+			}
 		}
 	} else {
 		name = getFullName(indirectType(reflect.TypeOf(ptrStructOrTableName)))

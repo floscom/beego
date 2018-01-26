@@ -969,8 +969,13 @@ func (d *dbBase) ReadBatch(q dbQuerier, qs *querySet, mi *modelInfo, cond *Condi
 		sels = strings.Replace(sels, qs.distinctOn+",", "", -1)
 	}
 
+	tableToSelect := Q + mi.table + Q
+	if strings.Contains(mi.table, "SELECT") {
+		tableToSelect = mi.table
+	}
+
 	//sels = ""
-	query := fmt.Sprintf("%s %s FROM %s%s%s T0 %s%s%s%s%s", sqlSelect, sels, Q, mi.table, Q, join, where, groupBy, orderBy, limit)
+	query := fmt.Sprintf("%s %s FROM %s T0 %s%s%s%s%s", sqlSelect, sels, tableToSelect, join, where, groupBy, orderBy, limit)
 	d.ins.ReplaceMarks(&query)
 
 	var rs *sql.Rows
