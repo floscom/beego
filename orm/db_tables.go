@@ -433,10 +433,12 @@ func (t *dbTables) getOrderSQL(orders []string) (orderSQL string) {
 
 		index, _, fi, suc := t.parseExprs(t.mi, exprs)
 		if suc == false {
-			panic(fmt.Errorf("unknown field/column name `%s`", strings.Join(exprs, ExprSep)))
+			//panic(fmt.Errorf("unknown field/column name `%s`", strings.Join(exprs, ExprSep)))
+			orderSqls = append(orderSqls, fmt.Sprintf("%s %s", order, asc))
+		} else {
+			orderSqls = append(orderSqls, fmt.Sprintf("%s.%s%s%s %s", index, Q, fi.column, Q, asc))
 		}
 
-		orderSqls = append(orderSqls, fmt.Sprintf("%s.%s%s%s %s", index, Q, fi.column, Q, asc))
 	}
 
 	orderSQL = fmt.Sprintf("ORDER BY %s ", strings.Join(orderSqls, ", "))

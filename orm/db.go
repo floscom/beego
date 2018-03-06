@@ -1639,7 +1639,11 @@ func (d *dbBase) ReadValues(q dbQuerier, qs *querySet, mi *modelInfo, cond *Cond
 	if qs.distinctOn != "" {
 		sqlSelect += fmt.Sprintf(" DISTINCT ON(%s) %s AS dval,", qs.distinctOn, qs.distinctOn)
 	}
-	query := fmt.Sprintf("%s %s FROM %s%s%s T0 %s%s%s%s%s", sqlSelect, sels, Q, mi.table, Q, join, where, groupBy, orderBy, limit)
+	tableToSelect := Q + mi.table + Q
+	if strings.Contains(mi.table, "SELECT") {
+		tableToSelect = mi.table
+	}
+	query := fmt.Sprintf("%s %s FROM %s T0 %s%s%s%s%s", sqlSelect, sels, tableToSelect, join, where, groupBy, orderBy, limit)
 
 	d.ins.ReplaceMarks(&query)
 

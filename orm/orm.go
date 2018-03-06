@@ -456,6 +456,7 @@ func (o *orm) QueryTable(ptrStructOrTableName interface{}) (qs QuerySeter) {
 			qs = newQuerySet(o, mi)
 		}
 	}
+
 	if qs == nil {
 		panic(fmt.Errorf("<Ormer.QueryTable> table name: `%s` not exists", name))
 	}
