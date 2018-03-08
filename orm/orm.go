@@ -442,6 +442,7 @@ func (o *orm) QueryTable(ptrStructOrTableName interface{}) (qs QuerySeter) {
 			name = snakeString(tableName[1])
 			if mi, ok := modelCache.get(name); ok {
 				mi.table = table
+				mi.tmp_table = tableName[1]
 				qs = newQuerySet(o, mi)
 			}
 		} else {

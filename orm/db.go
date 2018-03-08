@@ -970,8 +970,10 @@ func (d *dbBase) ReadBatch(q dbQuerier, qs *querySet, mi *modelInfo, cond *Condi
 	}
 
 	tableToSelect := Q + mi.table + Q
+
 	if strings.Contains(mi.table, "SELECT") {
 		tableToSelect = mi.table
+		mi.table = mi.tmp_table
 	}
 
 	//sels = ""

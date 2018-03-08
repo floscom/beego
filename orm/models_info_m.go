@@ -26,6 +26,7 @@ type modelInfo struct {
 	name      string
 	fullName  string
 	table     string
+	tmp_table string
 	model     interface{}
 	fields    *fields
 	manual    bool
